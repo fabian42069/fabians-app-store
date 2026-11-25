@@ -1,0 +1,10 @@
+# Built by tools/build-repo.mjs and published to Codeberg Pages, not kept in git
+site/
+# Android build output and local settings
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.kotlin/
+*.jks
+*.keystore

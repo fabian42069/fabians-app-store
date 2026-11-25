@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fabians App Store</title>
+<style>
+  /* Catppuccin Macchiato, mauve accent */
+  :root {
+    --crust: #181926; --mantle: #1e2030; --base: #24273a;
+    --surface0: #363a4f; --surface1: #494d64; --surface2: #5b6078; --overlay0: #6e738d;
+    --text: #cad3f5; --subtext1: #b8c0e0; --subtext0: #a5adcb;
+    --mauve: #c6a0f6; --green: #a6da95; --red: #ed8796; --peach: #f5a97f;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--base); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+
+  header { display: flex; align-items: center; gap: 12px; padding: 18px 16px 10px; }
+  header img { width: 40px; height: 40px; border-radius: 10px; }
+  header h1 { flex: 1; margin: 0; font-size: 20px; font-weight: 600; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--subtext0); }
+  .icon-btn:active { background: var(--surface0); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 8px 16px 24px; }
+  .tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px 12px; border-radius: 18px; background: var(--surface0); text-align: center; }
+  .tile:active { background: var(--surface1); }
+  .tile img { width: 64px; height: 64px; border-radius: 16px; object-fit: contain; }
+  .tile .name { font-size: 13px; line-height: 1.25; font-weight: 500; overflow-wrap: anywhere; }
+  /* The store's own tile: a different color, so it stands apart from the apps. */
+  .tile.store { background: var(--mauve); color: var(--crust); }
+  .tile.store:active { background: #b48ef0; }
+  .badge { position: absolute; top: 8px; right: 8px; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; background: var(--peach); color: var(--crust); }
+  .tile.store .badge { background: var(--crust); color: var(--mauve); }
+
+  .message { padding: 48px 24px; text-align: center; color: var(--subtext0); }
+  .message button { margin-top: 16px; }
+
+  .scrim { position: fixed; inset: 0; background: rgba(24, 25, 38, .7); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+  .scrim[hidden] { display: none; }
+  .sheet { width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; background: var(--mantle); border-radius: 24px 24px 0 0; padding: 20px 20px 28px; }
+  .sheet-head { display: flex; align-items: center; gap: 14px; }
+  .sheet-head img { width: 72px; height: 72px; border-radius: 18px; }
+  .sheet-head h2 { margin: 0; font-size: 20px; font-weight: 600; }
+  .sheet-head .meta { color: var(--subtext0); font-size: 13px; }
+  .sheet-head .close { margin-left: auto; align-self: flex-start; }
+  .summary { margin: 16px 0 6px; font-weight: 600; color: var(--subtext1); }
+  .description { margin: 0 0 20px; color: var(--subtext0); white-space: pre-line; }
+  .primary { width: 100%; height: 48px; border-radius: 24px; background: var(--mauve); color: var(--crust); font-weight: 600; font-size: 16px; }
+  .primary:disabled { opacity: .6; }
+  .secondary { width: 100%; height: 44px; margin-top: 10px; border-radius: 22px; background: var(--surface0); color: var(--text); font-weight: 500; }
+  .progress { height: 6px; border-radius: 3px; background: var(--surface0); overflow: hidden; margin: 14px 0 4px; }
+  .progress div { height: 100%; width: 0; background: var(--mauve); transition: width .2s; }
+  .status { min-height: 20px; font-size: 13px; color: var(--subtext0); }
+  .status.error { color: var(--red); }
+  .status.ok { color: var(--green); }
+  .note { margin: 0 0 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface0); color: var(--subtext1); font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="logo.png" alt="">
+  <h1>Fabians App Store</h1>
+  <button class="icon-btn" id="refresh" aria-label="Refresh">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+  </button>
+</header>
+<main id="main"><p class="message">Loading apps…</p></main>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="d-name">
+    <div class="sheet-head">
+      <img id="d-icon" alt="">
+      <div>
+        <h2 id="d-name"></h2>
+        <div class="meta" id="d-meta"></div>
+      </div>
+      <button class="icon-btn close" id="d-close" aria-label="Close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="summary" id="d-summary"></p>
+    <p class="description" id="d-description"></p>
+    <p class="note" id="d-permission" hidden>To install apps, Android needs your permission once. Tap “Allow installing”, switch it on, then come back.</p>
+    <button class="primary" id="d-action"></button>
+    <button class="secondary" id="d-open" hidden>Open</button>
+    <div class="progress" id="d-progress" hidden><div></div></div>
+    <div class="status" id="d-status"></div>
+  </div>
+</div>
+
+<script>
+// ?repo=… lets the page be tried against a local copy of the repository.
+const REPO = new URLSearchParams(location.search).get('repo') || 'https://fabian42069.codeberg.page/fabians-app-store/repo/';
+const native = window.Store; // the Android side; missing when the page is opened in a normal browser
+const SELF = native ? native.selfPackage() : 'nl.fabian42069.appstore';
+const $ = (id) => document.getElementById(id);
+
+let apps = [];        // [{ packageName, name, summary, description, icon, latest }]
+let installed = {};   // packageName -> installed versionCode (-1 = not installed)
+let busy = null;      // packageName being installed
+let shown = null;     // app in the pop-up
+
+/* ---------- Loading the store's index ---------- */
+const waiting = {};
+let seq = 0;
+window.onFetched = (id, ok, text) => { const w = waiting[id]; delete waiting[id]; if (w) (ok ? w.resolve : w.reject)(ok ? text : new Error(text)); };
+function getText(url) {
+  if (!native) return fetch(url, { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); });
+  return new Promise((resolve, reject) => { const id = 'f' + (++seq); waiting[id] = { resolve, reject }; native.fetch(url, id); });
+}
+
+async function load() {
+  try {
+    const index = JSON.parse(await getText(REPO + 'index-v1.json?t=' + Date.now()));
+    apps = index.apps.map((a) => {
+      const versions = (index.packages[a.packageName] || []).slice().sort((x, y) => y.versionCode - x.versionCode);
+      const en = (a.localized && (a.localized['en-US'] || a.localized.en)) || {};
+      return {
+        packageName: a.packageName,
+        name: en.name || a.name || a.packageName,
+        summary: en.summary || a.summary || '',
+        description: en.description || a.description || '',
+        icon: a.icon ? REPO + 'icons-640/' + a.icon : 'logo.png',
+        latest: versions[0],
+      };
+    }).filter((a) => a.latest);
+    // The store itself comes first, then the apps by name.
+    apps.sort((x, y) => (y.packageName === SELF) - (x.packageName === SELF) || x.name.localeCompare(y.name));
+    refreshInstalled();
+    render();
+  } catch (err) {
+    $('main').innerHTML = '';
+    const p = document.createElement('div');
+    p.className = 'message';
+    p.innerHTML = '<div>Couldn’t load the apps. Check your internet connection.</div><button class="primary" style="width:auto;padding:0 24px">Try again</button>';
+    p.querySelector('button').onclick = () => { $('main').innerHTML = '<p class="message">Loading apps…</p>'; load(); };
+    $('main').append(p);
+  }
+}
+
+function refreshInstalled() {
+  installed = native ? JSON.parse(native.installedVersions(JSON.stringify(apps.map((a) => a.packageName)))) : {};
+}
+const stateOf = (app) => {
+  const v = installed[app.packageName];
+  if (v == null || v < 0) return 'install';
+  return v < app.latest.versionCode ? 'update' : 'open';
+};
+
+/* ---------- The grid ---------- */
+function render() {
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  for (const app of apps) {
+    const tile = document.createElement('button');
+    tile.className = 'tile' + (app.packageName === SELF ? ' store' : '');
+    const img = document.createElement('img');
+    img.src = app.icon; img.alt = ''; img.loading = 'lazy';
+    const name = document.createElement('span');
+    name.className = 'name'; name.textContent = app.name;
+    tile.append(img, name);
+    if (stateOf(app) === 'update') {
+      const b = document.createElement('span'); b.className = 'badge'; b.textContent = 'Update'; tile.append(b);
+    }
+    tile.onclick = () => openSheet(app);
+    grid.append(tile);
+  }
+  $('main').replaceChildren(grid);
+}
+
+/* ---------- The pop-up ---------- */
+const sizeText = (bytes) => bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(bytes / 1024)) + ' KB';
+
+function openSheet(app) {
+  shown = app;
+  $('d-icon').src = app.icon;
+  $('d-name').textContent = app.name;
+  $('d-summary').textContent = app.summary;
+  $('d-description').textContent = app.description;
+  $('d-status').textContent = ''; $('d-status').className = 'status';
+  $('d-progress').hidden = true;
+  updateSheet();
+  $('scrim').hidden = false;
+}
+function closeSheet() { $('scrim').hidden = true; shown = null; }
+
+function updateSheet() {
+  const app = shown;
+  if (!app) return;
+  const state = stateOf(app);
+  const v = installed[app.packageName];
+  const meta = ['Version ' + app.latest.versionName, sizeText(app.latest.size)];
+  if (state === 'update') meta.push('you have an older version');
+  $('d-meta').textContent = meta.join(' · ');
+  const needPermission = native && state !== 'open' && !native.canInstall();
+  $('d-permission').hidden = !needPermission;
+  const action = $('d-action');
+  action.disabled = busy !== null;
+  $('d-open').hidden = !(state === 'update' && app.packageName !== SELF);
+  if (busy === app.packageName) action.textContent = 'Installing…';
+  else if (needPermission) action.textContent = 'Allow installing';
+  else action.textContent = { install: 'Install', update: 'Update', open: app.packageName === SELF ? 'Up to date' : 'Open' }[state];
+  if (state === 'open' && app.packageName === SELF) action.disabled = true;
+}
+
+$('d-action').onclick = () => {
+  const app = shown;
+  const state = stateOf(app);
+  if (state === 'open') { if (native) native.open(app.packageName); return; }
+  if (!native) { location.href = REPO + app.latest.apkName; return; }
+  if (!native.canInstall()) { native.openInstallSettings(); return; }
+  busy = app.packageName;
+  $('d-progress').hidden = false;
+  $('d-progress').firstElementChild.style.width = '0';
+  setStatus('Downloading…');
+  updateSheet();
+  native.install(REPO + app.latest.apkName, app.latest.hash, app.packageName);
+};
+$('d-open').onclick = () => native && native.open(shown.packageName);
+$('d-close').onclick = closeSheet;
+$('scrim').onclick = (e) => { if (e.target === $('scrim')) closeSheet(); };
+$('refresh').onclick = () => { $('main').innerHTML = '<p class="message">Loading apps…</p>'; load(); };
+
+function setStatus(text, kind = '') { $('d-status').textContent = text; $('d-status').className = 'status' + (kind ? ' ' + kind : ''); }
+
+window.onInstallProgress = (pkg, pct) => {
+  if (!shown || shown.packageName !== pkg) return;
+  if (pct > 100) { setStatus('Installing…'); $('d-progress').firstElementChild.style.width = '100%'; return; }
+  if (pct >= 0) { $('d-progress').firstElementChild.style.width = pct + '%'; setStatus('Downloading… ' + pct + '%'); }
+};
+window.onInstallDone = (pkg, ok, message) => {
+  busy = null;
+  refreshInstalled();
+  render();
+  if (shown && shown.packageName === pkg) {
+    $('d-progress').hidden = true;
+    setStatus(ok ? 'Installed.' : message || 'Installation failed.', ok ? 'ok' : 'error');
+    updateSheet();
+  }
+};
+window.onResume = () => { if (!apps.length) return; refreshInstalled(); render(); updateSheet(); };
+window.onBack = () => { if (!$('scrim').hidden) { closeSheet(); return true; } return false; };
+
+load();
+</script>
+</body>
+</html>

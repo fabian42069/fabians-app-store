@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="base">#24273A</color>
+    <color name="mauve">#C6A0F6</color>
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/base</item>
+        <item name="android:statusBarColor">@color/base</item>
+        <item name="android:navigationBarColor">@color/base</item>
+        <item name="android:colorAccent">@color/mauve</item>
+    </style>
+</resources>

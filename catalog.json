@@ -1,0 +1,50 @@
+{
+  "repo": {
+    "name": "Fabians App Store",
+    "description": "All of Fabian's apps: free and open source, made with AI because he needs and uses them himself.",
+    "address": "https://fabian42069.codeberg.page/fabians-app-store/repo",
+    "icon": "logo.png"
+  },
+  "apps": [
+    {
+      "packageName": "nl.fabian42069.appstore",
+      "name": "Fabians App Store",
+      "summary": "All of Fabian's apps in one place",
+      "description": "Install and update all of Fabian's apps from one place.\n\nThis is the store itself: when there is a new version of the store, you can update it right here.",
+      "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "icon": "logo.png",
+      "license": "GPL-3.0-or-later",
+      "categories": [
+        "System"
+      ],
+      "sourceCode": "https://codeberg.org/fabian42069/fabians-app-store"
+    },
+    {
+      "packageName": "nl.weegdagboek.app",
+      "name": "Weegdagboek",
+      "summary": "A simple daily weight diary",
+      "description": "Log your weight once a day and see how it changes.\n\nShows a chart with your daily weight and the weekly average, a table of weekly averages and a home-screen widget. Optional sync with your own Nextcloud, and backups as JSON or CSV.\n\nChoose your language in the menu: Dutch, English or Japanese.",
+      "apk": "C:/Users/fabian/Documents/Projecten/Weegdagboek/android/app/build/outputs/apk/debug/app-debug.apk",
+      "icon": "icons/weegdagboek.png",
+      "license": "GPL-3.0-or-later",
+      "categories": [
+        "Sports & Health"
+      ],
+      "sourceCode": "https://codeberg.org/fabian42069/Weegdagboek"
+    },
+    {
+      "packageName": "app.fairtaler.translate",
+      "name": "Fairtaler Translate",
+      "summary": "A private translator with extra help for Japanese",
+      "description": "Translate between many languages: offline with Mozilla's translator, so your text never leaves your phone, or with an online source of your choice.\n\nExtra help for Japanese: readings and romaji, type in romaji to write Japanese, and draw kanji or kana by hand. Listen to translations with natural voices. Your history and saved translations stay on your phone.\n\nThe offline translator, the Japanese dictionary and the voices are downloaded once, the first time you use them; after that they work offline.",
+      "apk": "C:/Users/fabian/AppData/Local/Claude-Data/claude_pzs8sxrjxfjjc/scratch-workspaces/6445c6ad-65c8-4339-8502-a11b3e7ea36c/6ab1a866-05f7-4098-82c9-8426680fb7cf/scratch-2026-11-25-3773d0/fairtaler-translate/release/Fairtaler-Translate-1.0.2.apk",
+      "icon": "icons/fairtaler.png",
+      "license": "GPL-3.0-or-later",
+      "categories": [
+        "Translation"
+      ],
+      "sourceCode": "https://codeberg.org/fabian42069/fairtaler-translate",
+      "webSite": "https://fabian42069.codeberg.page/fairtaler-translate/"
+    }
+  ]
+}

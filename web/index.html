@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fabians App Store</title>
+<link rel="icon" href="repo/icons/icon.png">
+<style>
+  :root {
+    --crust: #181926; --mantle: #1e2030; --base: #24273a; --surface0: #363a4f; --surface1: #494d64;
+    --text: #cad3f5; --subtext1: #b8c0e0; --subtext0: #a5adcb; --mauve: #c6a0f6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--base); color: var(--text); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 40px 20px 56px; }
+  .hero { text-align: center; }
+  .hero img { width: 112px; height: 112px; }
+  h1 { margin: 12px 0 4px; font-size: 28px; }
+  .lead { margin: 0 0 28px; color: var(--subtext0); }
+  .card { background: var(--mantle); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+  h2 { margin: 0 0 10px; font-size: 18px; }
+  p { margin: 0 0 12px; color: var(--subtext1); }
+  ol { margin: 0 0 14px; padding-left: 22px; color: var(--subtext1); }
+  .btn { display: inline-block; padding: 12px 24px; border-radius: 24px; background: var(--mauve); color: var(--crust); font-weight: 600; text-decoration: none; }
+  .btn.alt { background: var(--surface0); color: var(--text); }
+  code { display: block; padding: 10px 12px; border-radius: 10px; background: var(--crust); color: var(--subtext1); font-size: 13px; overflow-wrap: anywhere; }
+  .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 6px; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px; border-radius: 16px; background: var(--surface0); text-align: center; font-size: 13px; }
+  .app.store { background: var(--mauve); color: var(--crust); }
+  .app img { width: 56px; height: 56px; border-radius: 14px; }
+  .note { font-size: 14px; color: var(--subtext0); }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img src="repo/icons/icon.png" alt="">
+    <h1>Fabians App Store</h1>
+    <p class="lead">Privacy-focussed opensource slopware made in the Netherlands</p>
+  </div>
+
+  <div class="card">
+    <h2>Get the store</h2>
+    <ol>
+      <li>On your Android phone, download the store app.</li>
+      <li>Open the downloaded file and tap <b>Install</b>. If your phone asks, allow installing apps from this source.</li>
+      <li>Open <b>Fabians App Store</b> and tap an app to install it.</li>
+    </ol>
+    <a class="btn" href="FabiansAppStore.apk">Download Fabians App Store</a>
+  </div>
+
+  <div class="card">
+    <h2>Already use F-Droid?</h2>
+    <p>You can also add Fabians App Store to F-Droid as a repository. On your phone with F-Droid installed, tap:</p>
+    <p><a class="btn alt" id="fdroid" href="#">Add to F-Droid</a></p>
+    <p class="note">Or in F-Droid go to Settings → Repositories → + and enter:</p>
+    <code id="repo-url"></code>
+  </div>
+
+  <div class="card">
+    <h2>Apps in the store</h2>
+    <div class="apps" id="apps"></div>
+  </div>
+
+  <p class="note">The apps are free and open source. Their source code is on <a href="https://codeberg.org/fabian42069" style="color:var(--mauve)">Codeberg</a>.</p>
+</main>
+<script>
+(async () => {
+  const fp = (await (await fetch('fingerprint.txt')).text()).trim();
+  const address = new URL('repo', location.href).href;
+  const $ = (id) => document.getElementById(id);
+  $('repo-url').textContent = address + '?fingerprint=' + fp;
+  $('fdroid').href = address.replace(/^https:/, 'fdroidrepos:') + '?fingerprint=' + fp;
+  const index = await (await fetch('repo/index-v1.json', { cache: 'no-store' })).json();
+  const store = 'nl.fabian42069.appstore';
+  const apps = index.apps.slice().sort((a, b) => (b.packageName === store) - (a.packageName === store) || a.name.localeCompare(b.name));
+  for (const a of apps) {
+    const d = document.createElement('div');
+    d.className = 'app' + (a.packageName === store ? ' store' : '');
+    const img = document.createElement('img'); img.src = 'repo/icons-640/' + a.icon; img.alt = '';
+    const n = document.createElement('span'); n.textContent = a.name;
+    d.append(img, n);
+    $('apps').append(d);
+  }
+})();
+</script>
+</body>
+</html>
