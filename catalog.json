@@ -3,7 +3,7 @@
     "name": "Fabians App Store",
     "description": "All of Fabian's apps: free and open source, made with AI because he needs and uses them himself.",
     "address": "https://fabian42069.codeberg.page/fabians-app-store/repo",
-    "icon": "logo.png"
+    "icon": "icons/store.png"
   },
   "apps": [
     {
@@ -12,7 +12,7 @@
       "summary": "All of Fabian's apps in one place",
       "description": "Install and update all of Fabian's apps from one place.\n\nThis is the store itself: when there is a new version of the store, you can update it right here.",
       "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
-      "icon": "logo.png",
+      "icon": "icons/store.png",
       "license": "GPL-3.0-or-later",
       "categories": [
         "System"

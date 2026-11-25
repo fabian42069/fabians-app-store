@@ -13,25 +13,34 @@
     --mauve: #c6a0f6; --green: #a6da95; --red: #ed8796; --peach: #f5a97f;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; background: var(--base); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  html, body { margin: 0; background: var(--base); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overscroll-behavior-y: contain; }
   button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+  a { color: var(--mauve); }
 
   header { display: flex; align-items: center; gap: 12px; padding: 18px 16px 10px; }
-  header img { width: 40px; height: 40px; border-radius: 10px; }
-  header h1 { flex: 1; margin: 0; font-size: 20px; font-weight: 600; }
-  .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--subtext0); }
+  .logo-btn { padding: 0; border-radius: 10px; flex: none; }
+  .logo-btn img { display: block; width: 40px; height: 40px; border-radius: 10px; }
+  .title { flex: 1; min-width: 0; }
+  .title h1 { margin: 0; font-size: 20px; font-weight: 600; line-height: 1.2; }
+  .title .tagline { margin: 2px 0 0; font-size: 12px; color: var(--subtext0); line-height: 1.3; }
+  .icon-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--subtext0); flex: none; }
   .icon-btn:active { background: var(--surface0); }
+  .icon-btn.has-updates { color: var(--mauve); }
+  .count { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--peach); color: var(--crust); font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; }
+  .count[hidden] { display: none; }
+
+  /* Pull down from the top to refresh */
+  .pull { height: 0; overflow: hidden; display: grid; place-items: center; color: var(--mauve); }
+  .pull svg { transition: transform .1s; }
+  .pull.spinning svg { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 8px 16px 24px; }
   .tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 6px 12px; border-radius: 18px; background: var(--surface0); text-align: center; }
   .tile:active { background: var(--surface1); }
   .tile img { width: 64px; height: 64px; border-radius: 16px; object-fit: contain; }
   .tile .name { font-size: 13px; line-height: 1.25; font-weight: 500; overflow-wrap: anywhere; }
-  /* The store's own tile: a different color, so it stands apart from the apps. */
-  .tile.store { background: var(--mauve); color: var(--crust); }
-  .tile.store:active { background: #b48ef0; }
   .badge { position: absolute; top: 8px; right: 8px; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; background: var(--peach); color: var(--crust); }
-  .tile.store .badge { background: var(--crust); color: var(--mauve); }
 
   .message { padding: 48px 24px; text-align: center; color: var(--subtext0); }
   .message button { margin-top: 16px; }
@@ -49,23 +58,121 @@
   .primary { width: 100%; height: 48px; border-radius: 24px; background: var(--mauve); color: var(--crust); font-weight: 600; font-size: 16px; }
   .primary:disabled { opacity: .6; }
   .secondary { width: 100%; height: 44px; margin-top: 10px; border-radius: 22px; background: var(--surface0); color: var(--text); font-weight: 500; }
+  .secondary[hidden] { display: none; }
   .progress { height: 6px; border-radius: 3px; background: var(--surface0); overflow: hidden; margin: 14px 0 4px; }
   .progress div { height: 100%; width: 0; background: var(--mauve); transition: width .2s; }
   .status { min-height: 20px; font-size: 13px; color: var(--subtext0); }
   .status.error { color: var(--red); }
   .status.ok { color: var(--green); }
   .note { margin: 0 0 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface0); color: var(--subtext1); font-size: 14px; }
+
+  /* Updates list */
+  .updates h2 { margin: 0; font-size: 20px; font-weight: 600; }
+  .updates .sheet-head { margin-bottom: 8px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--surface0); }
+  .row img { width: 44px; height: 44px; border-radius: 12px; }
+  .row .info { flex: 1; min-width: 0; }
+  .row .info b { display: block; font-weight: 600; }
+  .row .info span { font-size: 13px; color: var(--subtext0); }
+  .row .info span.error { color: var(--red); }
+  .row .info span.ok { color: var(--green); }
+  .row button { flex: none; height: 36px; padding: 0 16px; border-radius: 18px; background: var(--mauve); color: var(--crust); font-weight: 600; }
+  .row button:disabled { opacity: .6; }
+  .updates .empty { padding: 28px 0 12px; text-align: center; color: var(--subtext0); }
+  .updates .primary { margin-top: 16px; }
+
+  /* About page */
+  #about[hidden], #home[hidden] { display: none; }
+  #about header h1 { flex: 1; margin: 0; font-size: 20px; font-weight: 600; }
+  .about { padding: 4px 16px 32px; max-width: 640px; margin: 0 auto; }
+  .about .hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 8px 0 18px; }
+  .about .hero img { width: 88px; height: 88px; border-radius: 22px; }
+  .about .hero h2 { margin: 12px 0 2px; font-size: 22px; }
+  .about .hero p { margin: 0; color: var(--subtext0); font-size: 14px; }
+  .card { margin: 0 0 12px; padding: 14px 16px; border-radius: 18px; background: var(--surface0); }
+  .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: var(--subtext1); }
+  .card p { margin: 0 0 8px; color: var(--subtext0); font-size: 14px; }
+  .card p:last-child { margin-bottom: 0; }
+  .links { display: grid; gap: 8px; }
+  .link { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--mantle); color: var(--text); text-decoration: none; }
+  .link:active { background: var(--surface1); }
+  .link small { display: block; color: var(--subtext0); font-size: 12px; }
+  .fp { font: 11px/1.4 ui-monospace, monospace; color: var(--subtext0); overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
-<header>
-  <img src="logo.png" alt="">
-  <h1>Fabians App Store</h1>
-  <button class="icon-btn" id="refresh" aria-label="Refresh">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
-  </button>
-</header>
-<main id="main"><p class="message">Loading apps…</p></main>
+<div id="home">
+  <header>
+    <button class="logo-btn" id="logo" aria-label="About Fabians App Store"><img src="store-icon.png" alt=""></button>
+    <div class="title">
+      <h1>Fabians App Store</h1>
+      <p class="tagline">Privacy-focussed opensource slopware made in the Netherlands</p>
+    </div>
+    <button class="icon-btn" id="updates-btn" aria-label="Updates">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+      <span class="count" id="updates-count" hidden></span>
+    </button>
+  </header>
+  <div class="pull" id="pull">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+  </div>
+  <main id="main"><p class="message">Loading apps…</p></main>
+</div>
+
+<div id="about" hidden>
+  <header>
+    <button class="icon-btn" id="about-back" aria-label="Back to the store">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <h1>About</h1>
+  </header>
+  <div class="about">
+    <div class="hero">
+      <img src="store-icon.png" alt="">
+      <h2>Fabians App Store</h2>
+      <p id="about-version">Version</p>
+      <p>Privacy-focussed opensource slopware made in the Netherlands</p>
+    </div>
+
+    <div class="card">
+      <p>ℹ️ The programs I publish are always free and open source. I generate them with AI for no other reason than that I need and use the app myself. I publish them so anyone who wants to can use them too. Because I don't know anything about programming, I probably won't accept merge requests, but feel free to fork the project and make something beautiful out of it.</p>
+    </div>
+
+    <div class="card">
+      <h3>Find me</h3>
+      <div class="links">
+        <a class="link" href="https://codeberg.org/fabian42069"><span>Codeberg<small>codeberg.org/fabian42069</small></span></a>
+        <a class="link" href="https://github.com/fabian42069"><span>GitHub<small>github.com/fabian42069</small></span></a>
+        <a class="link" href="https://campsite.bio/blinmaster"><span>Campsite<small>campsite.bio/blinmaster</small></span></a>
+        <a class="link" href="https://codeberg.org/fabian42069/fabians-app-store"><span>Source code of this store<small>codeberg.org/fabian42069/fabians-app-store</small></span></a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Privacy</h3>
+      <p>No account, no ads, no tracking, no analytics. The store only talks to <b>fabian42069.codeberg.page</b> to fetch the list of apps and to download the apps you choose to install.</p>
+    </div>
+
+    <div class="card">
+      <h3>How it works</h3>
+      <p>The store reads an F-Droid compatible repository and installs apps with Android's own installer. Every download is checked against its SHA-256 hash before it is installed, and all apps are signed with the same key, so updates install over the version you have.</p>
+      <p>You can also add the store to F-Droid as a repository:</p>
+      <p class="fp">https://fabian42069.codeberg.page/fabians-app-store/repo<br>Fingerprint: 2853411A91130DE71960D81040B6A992682C9DB1D67D39DD093A6031910D7625</p>
+    </div>
+
+    <div class="card">
+      <h3>License</h3>
+      <p>Fabians App Store and the apps in it are free software under the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a>. You may use, share and change them. They come without any warranty.</p>
+    </div>
+
+    <div class="card">
+      <h3>Credits</h3>
+      <p>Colors: <a href="https://catppuccin.com">Catppuccin</a> Macchiato. Hosting: <a href="https://codeberg.org">Codeberg</a>, a non-profit from Germany. Made with AI.</p>
+    </div>
+
+    <button class="primary" id="about-done">Back to the store</button>
+  </div>
+</div>
 
 <div class="scrim" id="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="d-name">
@@ -84,8 +191,23 @@
     <p class="note" id="d-permission" hidden>To install apps, Android needs your permission once. Tap “Allow installing”, switch it on, then come back.</p>
     <button class="primary" id="d-action"></button>
     <button class="secondary" id="d-open" hidden>Open</button>
+    <button class="secondary" id="d-web" hidden>Open web version</button>
     <div class="progress" id="d-progress" hidden><div></div></div>
     <div class="status" id="d-status"></div>
+  </div>
+</div>
+
+<div class="scrim" id="u-scrim" hidden>
+  <div class="sheet updates" role="dialog" aria-modal="true" aria-labelledby="u-title">
+    <div class="sheet-head">
+      <h2 id="u-title">Updates</h2>
+      <button class="icon-btn close" id="u-close" aria-label="Close">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="note" id="u-permission" hidden>To install updates, Android needs your permission once. Tap “Allow installing”, switch it on, then come back.</p>
+    <div id="u-list"></div>
+    <button class="primary" id="u-all" hidden>Update all</button>
   </div>
 </div>
 
@@ -96,9 +218,11 @@ const native = window.Store; // the Android side; missing when the page is opene
 const SELF = native ? native.selfPackage() : 'nl.fabian42069.appstore';
 const $ = (id) => document.getElementById(id);
 
-let apps = [];        // [{ packageName, name, summary, description, icon, latest }]
+let apps = [];        // [{ packageName, name, summary, description, icon, latest, web }]; includes the store itself
 let installed = {};   // packageName -> installed versionCode (-1 = not installed)
 let busy = null;      // packageName being installed
+let queue = [];       // packages waiting to be updated ("Update all")
+let rowStatus = {};   // packageName -> { text, kind } shown in the updates list
 let shown = null;     // app in the pop-up
 
 /* ---------- Loading the store's index ---------- */
@@ -121,21 +245,25 @@ async function load() {
         name: en.name || a.name || a.packageName,
         summary: en.summary || a.summary || '',
         description: en.description || a.description || '',
-        icon: a.icon ? REPO + 'icons-640/' + a.icon : 'logo.png',
+        icon: a.icon ? REPO + 'icons-640/' + a.icon : 'store-icon.png',
         latest: versions[0],
+        // An app has a web version when its website is something other than its source code.
+        web: a.webSite && a.webSite !== a.sourceCode ? a.webSite : null,
       };
     }).filter((a) => a.latest);
-    // The store itself comes first, then the apps by name.
-    apps.sort((x, y) => (y.packageName === SELF) - (x.packageName === SELF) || x.name.localeCompare(y.name));
+    apps.sort((x, y) => x.name.localeCompare(y.name));
     refreshInstalled();
     render();
+    return true;
   } catch (err) {
+    if (apps.length) return false; // keep showing what we had; a failed refresh shouldn't wipe the grid
     $('main').innerHTML = '';
     const p = document.createElement('div');
     p.className = 'message';
     p.innerHTML = '<div>Couldn’t load the apps. Check your internet connection.</div><button class="primary" style="width:auto;padding:0 24px">Try again</button>';
     p.querySelector('button').onclick = () => { $('main').innerHTML = '<p class="message">Loading apps…</p>'; load(); };
     $('main').append(p);
+    return false;
   }
 }
 
@@ -147,14 +275,17 @@ const stateOf = (app) => {
   if (v == null || v < 0) return 'install';
   return v < app.latest.versionCode ? 'update' : 'open';
 };
+// The store first (it updates itself last, see updateAll), then the apps.
+const pendingUpdates = () => apps.filter((a) => stateOf(a) === 'update').sort((x, y) => (y.packageName === SELF) - (x.packageName === SELF));
 
-/* ---------- The grid ---------- */
+/* ---------- The grid (the store itself is not shown as a tile) ---------- */
 function render() {
   const grid = document.createElement('div');
   grid.className = 'grid';
   for (const app of apps) {
+    if (app.packageName === SELF) continue;
     const tile = document.createElement('button');
-    tile.className = 'tile' + (app.packageName === SELF ? ' store' : '');
+    tile.className = 'tile';
     const img = document.createElement('img');
     img.src = app.icon; img.alt = ''; img.loading = 'lazy';
     const name = document.createElement('span');
@@ -167,9 +298,19 @@ function render() {
     grid.append(tile);
   }
   $('main').replaceChildren(grid);
+  renderUpdatesButton();
+  if (!$('u-scrim').hidden) renderUpdates();
 }
 
-/* ---------- The pop-up ---------- */
+function renderUpdatesButton() {
+  const n = pendingUpdates().length;
+  $('updates-count').hidden = n === 0;
+  $('updates-count').textContent = n;
+  $('updates-btn').classList.toggle('has-updates', n > 0);
+  $('updates-btn').setAttribute('aria-label', n ? n + (n === 1 ? ' update' : ' updates') : 'Updates');
+}
+
+/* ---------- The app pop-up ---------- */
 const sizeText = (bytes) => bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(bytes / 1024)) + ' KB';
 
 function openSheet(app) {
@@ -189,7 +330,6 @@ function updateSheet() {
   const app = shown;
   if (!app) return;
   const state = stateOf(app);
-  const v = installed[app.packageName];
   const meta = ['Version ' + app.latest.versionName, sizeText(app.latest.size)];
   if (state === 'update') meta.push('you have an older version');
   $('d-meta').textContent = meta.join(' · ');
@@ -198,10 +338,29 @@ function updateSheet() {
   const action = $('d-action');
   action.disabled = busy !== null;
   $('d-open').hidden = !(state === 'update' && app.packageName !== SELF);
+  $('d-web').hidden = !app.web;
   if (busy === app.packageName) action.textContent = 'Installing…';
   else if (needPermission) action.textContent = 'Allow installing';
   else action.textContent = { install: 'Install', update: 'Update', open: app.packageName === SELF ? 'Up to date' : 'Open' }[state];
   if (state === 'open' && app.packageName === SELF) action.disabled = true;
+}
+
+function openLink(url) {
+  if (native) location.href = url; // the app opens links in the normal browser
+  else window.open(url, '_blank', 'noopener');
+}
+
+function startInstall(app) {
+  busy = app.packageName;
+  rowStatus[app.packageName] = { text: 'Downloading…' };
+  if (shown && shown.packageName === app.packageName) {
+    $('d-progress').hidden = false;
+    $('d-progress').firstElementChild.style.width = '0';
+    setStatus('Downloading…');
+  }
+  updateSheet();
+  renderUpdates();
+  native.install(REPO + app.latest.apkName, app.latest.hash, app.packageName);
 }
 
 $('d-action').onclick = () => {
@@ -210,27 +369,94 @@ $('d-action').onclick = () => {
   if (state === 'open') { if (native) native.open(app.packageName); return; }
   if (!native) { location.href = REPO + app.latest.apkName; return; }
   if (!native.canInstall()) { native.openInstallSettings(); return; }
-  busy = app.packageName;
-  $('d-progress').hidden = false;
-  $('d-progress').firstElementChild.style.width = '0';
-  setStatus('Downloading…');
-  updateSheet();
-  native.install(REPO + app.latest.apkName, app.latest.hash, app.packageName);
+  startInstall(app);
 };
 $('d-open').onclick = () => native && native.open(shown.packageName);
+$('d-web').onclick = () => shown && shown.web && openLink(shown.web);
 $('d-close').onclick = closeSheet;
 $('scrim').onclick = (e) => { if (e.target === $('scrim')) closeSheet(); };
-$('refresh').onclick = () => { $('main').innerHTML = '<p class="message">Loading apps…</p>'; load(); };
 
 function setStatus(text, kind = '') { $('d-status').textContent = text; $('d-status').className = 'status' + (kind ? ' ' + kind : ''); }
 
+/* ---------- Updates ---------- */
+function openUpdates() { if (busy === null && !queue.length) rowStatus = {}; renderUpdates(); $('u-scrim').hidden = false; }
+function closeUpdates() { $('u-scrim').hidden = true; }
+
+function renderUpdates() {
+  const list = pendingUpdates();
+  // Also keep showing apps that were just updated in this pop-up, with their result.
+  const done = apps.filter((a) => rowStatus[a.packageName] && !list.includes(a));
+  const rows = list.concat(done);
+  const needPermission = native && list.length > 0 && !native.canInstall();
+  $('u-permission').hidden = !needPermission;
+  const box = $('u-list');
+  box.replaceChildren();
+  if (!rows.length) {
+    const p = document.createElement('p'); p.className = 'empty'; p.textContent = 'Everything is up to date.';
+    box.append(p);
+  }
+  for (const app of rows) {
+    const row = document.createElement('div'); row.className = 'row';
+    const img = document.createElement('img'); img.src = app.icon; img.alt = '';
+    const info = document.createElement('div'); info.className = 'info';
+    const name = document.createElement('b'); name.textContent = app.name;
+    const sub = document.createElement('span');
+    const st = rowStatus[app.packageName];
+    if (st) { sub.textContent = st.text; if (st.kind) sub.className = st.kind; }
+    else sub.textContent = 'Version ' + app.latest.versionName + ' · ' + sizeText(app.latest.size);
+    info.append(name, sub);
+    row.append(img, info);
+    if (list.includes(app)) {
+      const b = document.createElement('button');
+      b.textContent = busy === app.packageName ? '…' : queue.includes(app.packageName) ? 'Waiting' : 'Update';
+      b.disabled = busy !== null || queue.length > 0;
+      b.onclick = () => updateOne(app);
+      row.append(b);
+    }
+    box.append(row);
+  }
+  $('u-all').hidden = list.length < 2;
+  $('u-all').disabled = busy !== null || queue.length > 0;
+  $('u-all').textContent = needPermission ? 'Allow installing' : 'Update all';
+}
+
+function updateOne(app) {
+  if (!native) { location.href = REPO + app.latest.apkName; return; }
+  if (!native.canInstall()) { native.openInstallSettings(); return; }
+  startInstall(app);
+}
+function updateAll() {
+  if (!native) return;
+  if (!native.canInstall()) { native.openInstallSettings(); return; }
+  // The store updates itself last: installing it restarts the store.
+  queue = pendingUpdates().map((a) => a.packageName).sort((x, y) => (x === SELF) - (y === SELF));
+  next();
+}
+function next() {
+  const pkg = queue.shift();
+  const app = apps.find((a) => a.packageName === pkg);
+  if (app) startInstall(app); else renderUpdates();
+}
+
+$('updates-btn').onclick = openUpdates;
+$('u-close').onclick = closeUpdates;
+$('u-all').onclick = updateAll;
+$('u-scrim').onclick = (e) => { if (e.target === $('u-scrim')) closeUpdates(); };
+
+/* ---------- Install progress (from the Android side) ---------- */
 window.onInstallProgress = (pkg, pct) => {
+  const installing = pct > 100;
+  if (installing) rowStatus[pkg] = { text: 'Installing…' };
+  else if (pct >= 0) rowStatus[pkg] = { text: 'Downloading… ' + pct + '%' };
+  if (!$('u-scrim').hidden) renderUpdates();
   if (!shown || shown.packageName !== pkg) return;
-  if (pct > 100) { setStatus('Installing…'); $('d-progress').firstElementChild.style.width = '100%'; return; }
+  if (installing) { setStatus('Installing…'); $('d-progress').firstElementChild.style.width = '100%'; return; }
   if (pct >= 0) { $('d-progress').firstElementChild.style.width = pct + '%'; setStatus('Downloading… ' + pct + '%'); }
 };
 window.onInstallDone = (pkg, ok, message) => {
   busy = null;
+  rowStatus[pkg] = ok ? { text: 'Updated.', kind: 'ok' } : { text: message || 'Installation failed.', kind: 'error' };
+  if (!ok) queue = [];
   refreshInstalled();
   render();
   if (shown && shown.packageName === pkg) {
@@ -238,9 +464,62 @@ window.onInstallDone = (pkg, ok, message) => {
     setStatus(ok ? 'Installed.' : message || 'Installation failed.', ok ? 'ok' : 'error');
     updateSheet();
   }
+  if (queue.length) next();
 };
+
+/* ---------- About page ---------- */
+function openAbout() {
+  const v = native && native.selfVersion ? native.selfVersion() : '';
+  $('about-version').textContent = v ? 'Version ' + v : '';
+  $('home').hidden = true; $('about').hidden = false;
+  window.scrollTo(0, 0);
+}
+function closeAbout() { $('about').hidden = true; $('home').hidden = false; window.scrollTo(0, 0); }
+$('logo').onclick = openAbout;
+$('about-back').onclick = closeAbout;
+$('about-done').onclick = closeAbout;
+document.querySelectorAll('#about a').forEach((a) => { if (!native) { a.target = '_blank'; a.rel = 'noopener'; } });
+
+/* ---------- Pull down from the top to refresh ---------- */
+(() => {
+  const pull = $('pull'), icon = pull.firstElementChild;
+  const TRIGGER = 70, MAX = 110;
+  let startY = null, dist = 0, refreshing = false;
+  const blocked = () => refreshing || $('home').hidden || !$('scrim').hidden || !$('u-scrim').hidden;
+  const show = (h) => { pull.style.height = h + 'px'; icon.style.transform = 'rotate(' + (h * 3) + 'deg)'; pull.style.opacity = Math.min(1, h / TRIGGER); };
+  window.addEventListener('touchstart', (e) => {
+    startY = !blocked() && window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null;
+    dist = 0;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (startY == null) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy <= 0) { dist = 0; show(0); return; }
+    dist = Math.min(MAX, dy * 0.5);
+    show(dist);
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchend', async () => {
+    if (startY == null) return;
+    startY = null;
+    if (dist < TRIGGER) { pull.style.transition = 'height .15s'; show(0); setTimeout(() => (pull.style.transition = ''), 160); return; }
+    refreshing = true;
+    show(48); pull.classList.add('spinning');
+    await load();
+    pull.classList.remove('spinning');
+    pull.style.transition = 'height .15s'; show(0); setTimeout(() => (pull.style.transition = ''), 160);
+    refreshing = false;
+  });
+})();
+
+/* ---------- Android lifecycle ---------- */
 window.onResume = () => { if (!apps.length) return; refreshInstalled(); render(); updateSheet(); };
-window.onBack = () => { if (!$('scrim').hidden) { closeSheet(); return true; } return false; };
+window.onBack = () => {
+  if (!$('scrim').hidden) { closeSheet(); return true; }
+  if (!$('u-scrim').hidden) { closeUpdates(); return true; }
+  if (!$('about').hidden) { closeAbout(); return true; }
+  return false;
+};
 
 load();
 </script>

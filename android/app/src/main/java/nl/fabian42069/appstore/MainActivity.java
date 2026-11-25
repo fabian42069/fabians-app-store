@@ -108,6 +108,13 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String selfPackage() { return getPackageName(); }
 
+        /** The store's own version name, shown on the About page. */
+        @JavascriptInterface
+        public String selfVersion() {
+            try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionName; }
+            catch (PackageManager.NameNotFoundException e) { return ""; }
+        }
+
         /** Downloads a text file (the store index) and hands it to the page. */
         @JavascriptInterface
         public void fetch(String url, String callbackId) {
