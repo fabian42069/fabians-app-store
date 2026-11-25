@@ -42,7 +42,8 @@ const certDer = execFileSync(tool.keytool, ['-exportcert', '-keystore', keystore
 const signer = sha256(certDer);
 const sig = createHash('md5').update(certDer.toString('hex')).digest('hex');
 
-const catalog = JSON.parse(readFileSync(join(root, 'catalog.json'), 'utf8'));
+// CATALOG=path lets another computer use its own APK paths (catalog.json has the Windows ones).
+const catalog = JSON.parse(readFileSync(process.env.CATALOG || join(root, 'catalog.json'), 'utf8'));
 const site = join(root, 'site');
 const repoDir = join(site, 'repo');
 rmSync(repoDir, { recursive: true, force: true });
